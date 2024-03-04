@@ -47,6 +47,7 @@ from smashed.utils.io_utils import (
 
 from olmo import Tokenizer
 from olmo.util import prepare_cli_environment
+from morphpiece import MorphPiece
 
 log = logging.getLogger(__name__)
 
@@ -241,7 +242,10 @@ def fill_memmap(
     np.random.seed(random_seed)
 
     # we need to make a new tokenizer here because it's not pickleable
-    tokenizer = Tokenizer.from_pretrained(tokenizer_id, truncate_to=None)
+    if tokenizer_id=='morphpiece':
+        tokenizer = MorphPiece()
+    else:
+        tokenizer = Tokenizer.from_pretrained(tokenizer_id, truncate_to=None)
 
     # first memmap file will be created in the loop below
     memmap: Optional[MemmapFile] = None
@@ -348,7 +352,7 @@ def make_source_and_target(
     "--tokenizer",
     "tokenizer_id",
     type=str,
-    help="Name of path of a pretrained tokenizer",
+    help="Name or path of a pretrained tokenizer",
     default="allenai/eleuther-ai-gpt-neox-20b-pii-special",
 )
 @click.option("--dtype", "dtype_str", default="uint16")
